@@ -52,7 +52,7 @@ password TEXT NOT NULL);
 
 #Create PopUp
 def popUp(text):
-    answer = simpledialog.askstring("input string", text)
+    answer = simpledialog.askstring("Customer Name", text)
 
     return answer
 
@@ -69,6 +69,7 @@ def hashPassword(input):
     hash1 = hash1.hexdigest()
     return hash1
 
+# SET  LOGIN  INFORMATION FOR THE FIRST TIME 
 def inititalWindow():
     for widget in window.winfo_children():
         widget.destroy()
@@ -88,7 +89,7 @@ def inititalWindow():
 
     txt1 = Entry(window, width=20, show="*")
     txt1.pack()
-
+    # STORE THE NEWLY DEFINED PASSWORD IN THE DB AS A HASHED VALUE 
     def savePassword():
         if txt.get() == txt1.get():
             sql = "DELETE FROM masterpassword WHERE id = 1"
@@ -114,6 +115,7 @@ def inititalWindow():
     btn = Button(window, text="Save", command=savePassword)
     btn.pack(pady=5)
 
+# DISPLAY RECOVERY KEY FOR  BACK UP PURPOSES
 def recoveryScreen(key):
     for widget in window.winfo_children():
         widget.destroy()
@@ -177,7 +179,7 @@ def loginScreen():
     for widget in window.winfo_children():
         widget.destroy()
 
-    window.geometry('250x125')
+    window.geometry('350x225')
 
     lbl = Label(window, text="Enter  Master Password")
     lbl.config(anchor=CENTER)
@@ -205,15 +207,15 @@ def loginScreen():
             vaultScreen()
         else:
             txt.delete(0, 'end')
-            lbl1.config(text="Wrong Password")
+            lbl1.config(text="Invalid Password")
     
     def resetPassword():
         resetScreen()
 
-    btn = Button(window, text="Submit", command=checkPassword)
+    btn = Button(window, text="Login", command=checkPassword)
     btn.pack(pady=5)
 
-    btn = Button(window, text="Reset Password", command=resetPassword)
+    btn = Button(window, text="Recover via Recovery Phrase", command=resetPassword)
     btn.pack(pady=5)
 
 
@@ -224,14 +226,14 @@ def vaultScreen():
     def addEntry():
         text1 = "Name"
         text2 = "Order"
-        text3 = "Password"
-        website = encrypt(popUp(text1).encode(), encryptionKey)
-        username = encrypt(popUp(text2).encode(), encryptionKey)
-        password = encrypt(popUp(text3).encode(), encryptionKey)
+        text3 = "Addresss"
+        name = encrypt(popUp(text1).encode(), encryptionKey)
+        order = encrypt(popUp(text2).encode(), encryptionKey)
+        address = encrypt(popUp(text3).encode(), encryptionKey)
 
         insert_fields = """INSERT INTO vault(website, username, password) 
         VALUES(?, ?, ?) """
-        cursor.execute(insert_fields, (website, username, password))
+        cursor.execute(insert_fields, (name, order, address))
         db.commit()
 
         vaultScreen()
@@ -241,13 +243,13 @@ def vaultScreen():
         db.commit()
         vaultScreen()
 
-    window.geometry('750x550')
+    window.geometry('900x900')
     window.resizable(height=None, width=None)
-    lbl = Label(window, text="OrderVault")
+    lbl = Label(window, text="Current Orders ")
     lbl.grid(column=1)
 
-    btn = Button(window, text="+", command=addEntry)
-    btn.grid(column=1, pady=10)
+    btn = Button(window, text="New Order", command=addEntry)
+    btn.grid(row=10, pady=10, )
 
     lbl = Label(window, text="Name")
     lbl.grid(row=2, column=0, padx=80)
@@ -266,7 +268,7 @@ def vaultScreen():
             if (len(array) == 0):
                 break
 
-            lbl1 = Label(window, text=(decrypt(array[i][1], encryptionKey)), font=("Helvetica", 12))
+            lbl1 = Label(window, text=(decrypt(array[i][1], encryptionKey)), font=("TimesNewRoman", 19))
             lbl1.grid(column=0, row=(i+3))
             lbl2 = Label(window, text=(decrypt(array[i][2], encryptionKey)), font=("Helvetica", 12))
             lbl2.grid(column=1, row=(i+3))
